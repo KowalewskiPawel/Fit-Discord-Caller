@@ -1,13 +1,11 @@
 module.exports = {
-  "compilerOptions": {
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "outDir": "dist",
-    "target": "es2015",
-    "module": "commonjs",
-    "strict": true,
+  compilerOptions: {
+    module: "CommonJS",
+    esModuleInterop: true,
+    target: 'es6',
+    moduleResultion: 'node',
+    sourceMap: true,
+    outDir: 'dist',
   },
-  "lib": ["es2015"]
-}
+  lib: ["es2015"],
+};
