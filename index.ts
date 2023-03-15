@@ -34,7 +34,7 @@ app.get('/api/getURL', async (req, res) => {
         const body = await response.text();
         console.log(body);
 
-        res.send({ response });
+        res.send({ url });
     } catch (error) {
         console.error(error);
 
