@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from 'dotenv';
 import fetch from "node-fetch";
+import url from 'node:url';
 import { google } from "googleapis";
 
 dotenv.config();
@@ -20,28 +21,22 @@ app.get('/api/getURL', async (req, res) => {
 
     const scopes = ['https://www.googleapis.com/auth/fitness.activity.read profile email openid'];
 
-    const url = oauthClient.generateAuthUrl({
+    const googleAuthUrl = oauthClient.generateAuthUrl({
         access_type: 'offline',
-        scope: scopes,
-        state: JSON.stringify({
-            callbackUrl: req.body.callbackUrl,
-            userID: req.body.userid
-        })
+        scope: scopes
     });
-
-    try {
-        const response = await fetch(url);
-        const body = await response.text();
-        console.log(body);
-
-        res.send({ url });
-    } catch (error) {
-        console.error(error);
-
-        res.send({ error });
-    }
-
+        res.send({ googleAuthUrl });
 });
+
+app.get('/api/activity', (req, res) => {
+    const queryURL = url.parse(req.url);
+
+    const urlParams = new URLSearchParams(queryURL.query as string);
+
+    const [code] = urlParams.values();
+
+    res.send("OK!");
+ }); 
 
 app.listen(PORT, () => {
     console.log(`Listening on port: ${PORT}`);
