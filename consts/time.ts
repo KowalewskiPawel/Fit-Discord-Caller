@@ -1,0 +1,2 @@
+export const ONE_DAY_MILLIS = 86400000;
+export const ONE_HOUR_MILLIS = 3600000;
