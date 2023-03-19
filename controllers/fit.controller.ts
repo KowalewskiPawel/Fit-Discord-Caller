@@ -1,10 +1,10 @@
 import fetch from "node-fetch";
-import url from "node:url";
+import { parse as parseUrl } from "node:url";
 import { Request, Response } from "express";
 import { google } from "googleapis";
 import dotenv from 'dotenv';
-import { ONE_DAY_MILLIS, ONE_HOUR_MILLIS } from "../consts";
-import { getAccessCode, writeAccessCode } from "../utils/fs";
+import { getAccessCode, writeAccessCode, generateFitBody } from "../utils";
+import { FIT_TYPE } from "../types";
 
 dotenv.config();
 
@@ -14,7 +14,7 @@ const oauthClient = new google.auth.OAuth2(
   process.env.REDIRECT_URI
 );
 
-export const getOathUrl = async (req: Request, res: Response) => {
+export const getOathUrl = async (_req: Request, res: Response) => {
   try {
     const scopes = ["https://www.googleapis.com/auth/fitness.activity.read"];
 
@@ -33,7 +33,7 @@ export const getOathUrl = async (req: Request, res: Response) => {
 
 export const authorizeUser = async (req: Request, res: Response) => {
   try {
-    const queryURL = url.parse(req.url);
+    const queryURL = parseUrl(req.url);
     const urlParams = new URLSearchParams(queryURL.query as string);
     const [code] = urlParams.values();
 
@@ -42,7 +42,7 @@ export const authorizeUser = async (req: Request, res: Response) => {
 
     writeAccessCode(access_token as string);
 
-    return res.status(200).send("OK");
+    return res.status(200).send("User authorized!");
   } catch (err) {
     return res.status(500).json({
       error: err,
@@ -50,23 +50,10 @@ export const authorizeUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getActiveMinutes = async (req: Request, res: Response) => {
-  const nowHours = new Date(Date.now()).getHours();
-
+export const getActiveMinutes = async (_req: Request, res: Response) => {
   const accessToken = getAccessCode();
 
-  const data = {
-    aggregateBy: [
-      {
-        dataTypeName: "com.google.active_minutes",
-        dataSourceId:
-          "derived:com.google.active_minutes:com.google.android.gms:merge_active_minutes",
-      },
-    ],
-    bucketByTime: { durationMillis: ONE_DAY_MILLIS },
-    startTimeMillis: Date.now() - nowHours * ONE_HOUR_MILLIS,
-    endTimeMillis: Date.now(),
-  };
+  const fetchBody = generateFitBody(FIT_TYPE.ACTIVITY);
 
   try {
     const response = await fetch(
@@ -77,7 +64,7 @@ export const getActiveMinutes = async (req: Request, res: Response) => {
           "Content-Type": "application/json",
           authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(fetchBody),
       }
     );
 
@@ -94,20 +81,11 @@ export const getActiveMinutes = async (req: Request, res: Response) => {
   }
 };
 
-export const getSteps = async (req: Request, res: Response) => {
-    const nowHours = new Date(Date.now()).getHours();
-  
+export const getSteps = async (_req: Request, res: Response) => {
+
     const accessToken = getAccessCode();
   
-    const data = {
-        "aggregateBy": [{
-          "dataTypeName": "com.google.step_count.delta",
-          "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
-        }],
-        "bucketByTime": { "durationMillis": ONE_DAY_MILLIS },
-        "startTimeMillis": Date.now() - (nowHours * ONE_HOUR_MILLIS),
-        "endTimeMillis": Date.now()
-      };
+    const fetchBody = generateFitBody(FIT_TYPE.STEPS);
   
     try {
       const response = await fetch(
@@ -118,7 +96,7 @@ export const getSteps = async (req: Request, res: Response) => {
             "Content-Type": "application/json",
             authorization: `Bearer ${accessToken}`,
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(fetchBody),
         }
       );
   
