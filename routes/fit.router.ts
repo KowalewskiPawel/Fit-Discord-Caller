@@ -8,7 +8,8 @@ import {
 
 export const fitRouter = Router();
 
-fitRouter.get("/getURL", getOathUrl);
-fitRouter.get("/authorizeUser", authorizeUser);
-fitRouter.get("/getActiveMinutes", getActiveMinutes);
-fitRouter.get("/getSteps", getSteps);
+fitRouter
+  .get("/getURL", getOathUrl)
+  .get("/authorizeUser", authorizeUser)
+  .get("/getActiveMinutes", getActiveMinutes)
+  .get("/getSteps", getSteps);
