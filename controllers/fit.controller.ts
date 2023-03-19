@@ -1,10 +1,11 @@
-import fetch from "node-fetch";
+
 import { parse as parseUrl } from "node:url";
 import { Request, Response } from "express";
 import { google } from "googleapis";
-import dotenv from 'dotenv';
-import { getAccessCode, writeAccessCode, generateFitBody } from "../utils";
+import dotenv from "dotenv";
+import { writeAccessCode } from "../utils";
 import { FIT_TYPE } from "../types";
+import { fetchFitApi } from "../utils/fetchFitApi";
 
 dotenv.config();
 
@@ -51,64 +52,30 @@ export const authorizeUser = async (req: Request, res: Response) => {
 };
 
 export const getActiveMinutes = async (_req: Request, res: Response) => {
-  const accessToken = getAccessCode();
-
-  const fetchBody = generateFitBody(FIT_TYPE.ACTIVITY);
-
   try {
-    const response = await fetch(
-      "https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(fetchBody),
-      }
-    );
-
-    const activityResponse = await response.json();
+    const activityResponse = await fetchFitApi(FIT_TYPE.ACTIVITY);
 
     return res.status(200).json({
       activeMinutes:
-        activityResponse.bucket[0].dataset[0].point[0].value[0].intVal,
+        activityResponse
     });
   } catch (err) {
     return res.status(500).json({
-        error: err,
-      });
+      error: err,
+    });
   }
 };
 
 export const getSteps = async (_req: Request, res: Response) => {
+  try {
+    const activityResponse = await fetchFitApi(FIT_TYPE.STEPS);
 
-    const accessToken = getAccessCode();
-  
-    const fetchBody = generateFitBody(FIT_TYPE.STEPS);
-  
-    try {
-      const response = await fetch(
-        "https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify(fetchBody),
-        }
-      );
-  
-      const activityResponse = await response.json();
-  
-      return res.status(200).json({
-        steps:
-          activityResponse.bucket[0].dataset[0].point[0].value[0].intVal,
-      });
-    } catch (err) {
-      return res.status(500).json({
-          error: err,
-        });
-    }
-  };
+    return res.status(200).json({
+      steps: activityResponse
+    });
+  } catch (err) {
+    return res.status(500).json({
+      error: err,
+    });
+  }
+};
