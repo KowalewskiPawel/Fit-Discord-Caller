@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cron from "node-cron";
 import { fitRouter } from "./routes";
 import { client, token } from "./discord/discordClient";
-import { sendFitUpdate } from "./utils";
+import { sendFitUpdate, writeFitGoal } from "./utils";
 
 dotenv.config();
 
@@ -18,8 +18,9 @@ app.use("/api/fit", fitRouter);
 app.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
   client.login(token);
+  writeFitGoal(false);
 });
 
 cron.schedule("* * * * *", () => {
-  sendFitUpdate();
+ sendFitUpdate();
 });

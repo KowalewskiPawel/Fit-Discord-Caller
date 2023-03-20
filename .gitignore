@@ -1,4 +1,5 @@
 /node_modules
 access_code.json
+fit_goal.json
 .env
 yarn-error.log
