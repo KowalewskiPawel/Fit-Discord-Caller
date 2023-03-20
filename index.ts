@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from 'dotenv';
 import { fitRouter } from "./routes";
+import { client, token } from "./discord/discordClient";
 
 dotenv.config();
 
@@ -14,4 +15,5 @@ app.use('/api/fit', fitRouter);
 
 app.listen(PORT, () => {
     console.log(`Listening on port: ${PORT}`);
+    client.login(token);
 });

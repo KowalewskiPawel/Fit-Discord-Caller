@@ -1,3 +1,4 @@
 /node_modules
 access_code.json
 .env
+yarn-error.log

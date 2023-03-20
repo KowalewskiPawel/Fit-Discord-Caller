@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { writeAccessCode } from "../utils";
 import { FIT_TYPE } from "../types";
 import { fetchFitApi } from "../utils/fetchFitApi";
+import { sendDiscordMessage } from "../discord/discordClient";
 
 dotenv.config();
 
@@ -73,6 +74,19 @@ export const getSteps = async (_req: Request, res: Response) => {
     return res.status(200).json({
       steps: activityResponse
     });
+  } catch (err) {
+    return res.status(500).json({
+      error: err,
+    });
+  }
+};
+
+export const sendDiscord = async (_req: Request, res: Response) => {
+  try {
+
+    sendDiscordMessage();
+
+    return res.status(200).send("OK");
   } catch (err) {
     return res.status(500).json({
       error: err,
