@@ -17,7 +17,7 @@ export const sendFitUpdate = async () => {
   const stepsResponse = await fetchFitApi(FIT_TYPE.STEPS, accessToken);
   const activeMinutes = await fetchFitApi(FIT_TYPE.ACTIVITY, accessToken);
 
-  if (stepsResponse > 80 || activeMinutes > 40) {
+  if (stepsResponse > 8000 || activeMinutes > 40) {
     sendDiscordMessage(activeMinutes, stepsResponse);
     writeFitGoal(true);
   }
