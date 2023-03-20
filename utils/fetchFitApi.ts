@@ -1,12 +1,10 @@
 import fetch from "node-fetch";
-import { generateFitBody, getAccessCode } from ".";
+import { generateFitBody } from ".";
 import { GOOGLE_FIT_API } from "../consts";
 import { FIT_TYPE } from "../types";
 
-export const fetchFitApi = async (activityType: FIT_TYPE) => {
+export const fetchFitApi = async (activityType: FIT_TYPE, accessToken: string) => {
   try {
-    const accessToken = getAccessCode();
-
     const fetchBody = generateFitBody(activityType);
 
     const response = await fetch(GOOGLE_FIT_API, {

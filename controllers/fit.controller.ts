@@ -1,4 +1,3 @@
-
 import { parse as parseUrl } from "node:url";
 import { Request, Response } from "express";
 import { google } from "googleapis";
@@ -15,6 +14,11 @@ const oauthClient = new google.auth.OAuth2(
   process.env.CLIENT_SECRET,
   process.env.REDIRECT_URI
 );
+
+export const getAccessToken = async () => {
+  const { token } = await oauthClient.getAccessToken();
+  return token;
+}
 
 export const getOathUrl = async (_req: Request, res: Response) => {
   try {
@@ -39,8 +43,11 @@ export const authorizeUser = async (req: Request, res: Response) => {
     const urlParams = new URLSearchParams(queryURL.query as string);
     const [code] = urlParams.values();
 
-    const authToken = await oauthClient.getToken(code);
-    const { access_token } = authToken.tokens;
+    const { tokens } = await oauthClient.getToken(code);
+
+    oauthClient.setCredentials(tokens);
+
+    const { access_token } = tokens;
 
     writeAccessCode(access_token as string);
 
@@ -54,11 +61,12 @@ export const authorizeUser = async (req: Request, res: Response) => {
 
 export const getActiveMinutes = async (_req: Request, res: Response) => {
   try {
-    const activityResponse = await fetchFitApi(FIT_TYPE.ACTIVITY);
+    const accessToken = await getAccessToken() as string;
+
+    const activityResponse = await fetchFitApi(FIT_TYPE.ACTIVITY, accessToken);
 
     return res.status(200).json({
-      activeMinutes:
-        activityResponse
+      activeMinutes: activityResponse,
     });
   } catch (err) {
     return res.status(500).json({
@@ -69,10 +77,11 @@ export const getActiveMinutes = async (_req: Request, res: Response) => {
 
 export const getSteps = async (_req: Request, res: Response) => {
   try {
-    const activityResponse = await fetchFitApi(FIT_TYPE.STEPS);
+    const accessToken = await getAccessToken() as string;
+    const activityResponse = await fetchFitApi(FIT_TYPE.STEPS, accessToken);
 
     return res.status(200).json({
-      steps: activityResponse
+      steps: activityResponse,
     });
   } catch (err) {
     return res.status(500).json({
@@ -84,8 +93,10 @@ export const getSteps = async (_req: Request, res: Response) => {
 export const sendDiscord = async (_req: Request, res: Response) => {
   try {
 
-    const activityResponse = await fetchFitApi(FIT_TYPE.ACTIVITY);
-    const stepsResponse = await fetchFitApi(FIT_TYPE.STEPS);
+    const accessToken = await getAccessToken() as string;
+
+    const activityResponse = await fetchFitApi(FIT_TYPE.ACTIVITY, accessToken);
+    const stepsResponse = await fetchFitApi(FIT_TYPE.STEPS, accessToken);
 
     sendDiscordMessage(activityResponse, stepsResponse);
 

@@ -21,6 +21,6 @@ app.listen(PORT, () => {
   writeFitGoal(false);
 });
 
-cron.schedule("* * * * *", () => {
+cron.schedule("*/10 * * * *", () => {
  sendFitUpdate();
 });
