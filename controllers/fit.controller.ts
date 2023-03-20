@@ -84,7 +84,10 @@ export const getSteps = async (_req: Request, res: Response) => {
 export const sendDiscord = async (_req: Request, res: Response) => {
   try {
 
-    sendDiscordMessage();
+    // const activityResponse = await fetchFitApi(FIT_TYPE.ACTIVITY);
+    const stepsResponse = await fetchFitApi(FIT_TYPE.STEPS);
+
+    sendDiscordMessage(0, stepsResponse);
 
     return res.status(200).send("OK");
   } catch (err) {

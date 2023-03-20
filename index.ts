@@ -1,7 +1,9 @@
 import express from "express";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
+import cron from "node-cron";
 import { fitRouter } from "./routes";
 import { client, token } from "./discord/discordClient";
+import { sendFitUpdate } from "./utils";
 
 dotenv.config();
 
@@ -11,9 +13,13 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3008;
 
-app.use('/api/fit', fitRouter);
+app.use("/api/fit", fitRouter);
 
 app.listen(PORT, () => {
-    console.log(`Listening on port: ${PORT}`);
-    client.login(token);
+  console.log(`Listening on port: ${PORT}`);
+  client.login(token);
+});
+
+cron.schedule("* * * * *", () => {
+  sendFitUpdate();
 });

@@ -12,12 +12,12 @@ client.once(Events.ClientReady, current => {
 	console.log(`Ready! Logged in as ${current.user.tag}`);
 });
 
-export const sendDiscordMessage = async () => {
+export const sendDiscordMessage = async (activity: number, steps: number) => {
     try {
     const channel = await client.channels.fetch(discordChannel);
     
     /* @ts-ignore */
-    await channel?.send('hi');
+    await channel?.send(`Gratulacje Paweł! Twój wynik dzisiaj to ${activity} aktywnych minut, ${steps} kroków.`);
     } catch(err) {
         console.error(err);
     }
