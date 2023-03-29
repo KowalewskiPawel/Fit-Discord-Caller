@@ -27,6 +27,7 @@ export const getOathUrl = async (_req: Request, res: Response) => {
     const googleAuthUrl = oauthClient.generateAuthUrl({
       access_type: "offline",
       scope: scopes,
+      prompt: 'consent'
     });
 
     return res.status(200).json({ googleAuthUrl });
@@ -98,7 +99,7 @@ export const sendDiscord = async (_req: Request, res: Response) => {
     const activityResponse = await fetchFitApi(FIT_TYPE.ACTIVITY, accessToken);
     const stepsResponse = await fetchFitApi(FIT_TYPE.STEPS, accessToken);
 
-    sendDiscordMessage(activityResponse, stepsResponse);
+    // sendDiscordMessage(activityResponse, stepsResponse);
 
     return res.status(200).send("OK");
   } catch (err) {
